@@ -16,7 +16,7 @@ const clipTable = [
         "descripton": "this it comment naja😎"
     },
     {
-        "clip_id": "C1",
+        "clip_id": "C2",
         "user_id": "U2",
         "name": "chiangrak",
         "video_path": "/video/",
@@ -33,7 +33,7 @@ const clipTable = [
 
     },
     {
-        "clip_id": "C2",
+        "clip_id": "C3",
         "user_id": "U1",
         "name": "chiangrak",
         "video_path": "/video/",
@@ -59,6 +59,7 @@ const userTable = [
         "username":"Name",
         "password":"password",
         "user_type":"user1",
+        "status": "inactive",
         "create_date":"2025-03-04",
         "modify_date":"2025-03-04",
     },
@@ -68,6 +69,7 @@ const userTable = [
         "username":"Name2",
         "password":"password",
         "user_type":"user2",
+        "status": "inactive",
         "create_date":"2025-03-04",
         "modify_date":"2025-03-04",
     },
@@ -77,6 +79,7 @@ const userTable = [
         "username":"Name3",
         "password":"password",
         "user_type":"user3",
+        "status": "inactive",
         "create_date":"2025-03-04",
         "modify_date":"2025-03-04",
     },
