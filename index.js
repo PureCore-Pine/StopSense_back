@@ -33,10 +33,8 @@ app.get('/getDataID/:clip_id', (req, res) => {
     res.json(clip);  // Send the clip as JSON response
 });
 
-// get only 1 item
 
 //get All Item
-
 app.post('/getAllClips', (req, res) => {
     const { user_id } = req.body; // Extract user_id from request body
 
@@ -53,28 +51,30 @@ app.post('/getAllClips', (req, res) => {
     res.json(userClips);
 });
 
+
 app.post('/createUser', (req, res) => {
     const { username, email } = req.body;
     res.json({ message: `User Created: ${username}, Email: ${email}` });
 });
 
 
+app.get('/getAllUser')
 
+// Uesr login
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
 
+    // console.log(username, password)
+    const user = userTable.find(user => user.username === username && user.password === password);
 
-
-
-////////////////////////////////// Test ///////////////////////////////////////////////
-
-app.get('/getAllClip', (req, res) => {
-    const { user_id } = req.query; // Extract query param
-    if (!user_id) {
-        return res.status(400).json({ error: "Missing user_id" });
+    if (user) {
+        return res.json({ success: true, message: 'Login successful' })
     }
-    res.json({ message: `Received user_id: ${user_id}` });
-});
+    
+    return res.status(401).json({ success: false, message: 'Invalid user or password' })
 
 
+})
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
