@@ -9,6 +9,9 @@ const port = 3000;
 app.use(cors());
 app.use(express.json()); // Middleware to parse JSON request body
 
+app.get('/', (req,res) => {
+    res.send("hello would")
+})
 
 // get only 1 item
 app.get('/getClipID/:clip_id', (req, res) => {
@@ -41,11 +44,6 @@ app.post('/getAllClips', (req, res) => {
     }
 
     res.json(userClips);
-});
-
-app.post('/createUser', (req, res) => {
-    const { username, email } = req.body;
-    res.json({ message: `User Created: ${username}, Email: ${email}` });
 });
 
 // Uesr login
