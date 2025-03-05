@@ -35,7 +35,7 @@ const clipTable = [
     {
         "clip_id": "C3",
         "user_id": "U1",
-        "name": "chiangrak",
+        "name": "qwerty",
         "video_path": "/video/",
         "upload_date": "2025-03-04",
 

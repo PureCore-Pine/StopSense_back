@@ -24,12 +24,13 @@ app.get('/getClipID/:clip_id', (req, res) => {
         return res.status(404).json({ error: "Clip not found" });
     }
 
+
     console.log(clip);  // Log the found clip
 
     res.json(clip);  // Send the clip as JSON response
 });
 
-//get All Item
+// Get All Clips
 app.post('/getAllClips', (req, res) => {
     const { user_id } = req.body; // Extract user_id from request body
 
@@ -43,7 +44,7 @@ app.post('/getAllClips', (req, res) => {
         return res.status(404).json({ error: "No clips found for this user" });
     }
 
-    res.json(userClips);
+    return res.status(200).json({ success: true, clips: userClips });
 });
 
 // app.post('/createUser', (req, res) => {
@@ -56,12 +57,11 @@ app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
     try {
-
         // console.log(username, password)
         const user = userTable.find(user => user.username === username && user.password === password);
 
         if (!user) {
-            return res.status(404).json({ success: false, message: "User not found" });
+            return res.status(401).json({ success: false, message: 'Invalid user or password' });
         }
 
         // Change status to "inactive"
@@ -101,42 +101,49 @@ app.put('/logout', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-    const {
-        email,
-        username,
-        password,
-        comfirmPassword
-    } = req.body;
+    const { email, username, password, confirmPassword } = req.body;
 
-    if (password !== comfirmPassword) {
-        return res.status(401).json({ success: false, message: 'password do not match' })
+    console.log(req.body);
+
+    if (password != confirmPassword || password === '') {
+        return res.status(401).json({ success: false, message: 'Passwords do not match' });
     }
 
-    const d = new Date()
+    if (!username || !email) {
+        return res.status(401).json({ success: false, message: 'Invalid email or username' });
+    }
 
+    if (userTable.some(item => item.email === email)) {
+        return res.status(401).json({ success: false, message: 'This email is already used' });
+    }
+
+    if (userTable.some(item => item.username === username)) {
+        return res.status(401).json({ success: false, message: 'Username is already used' });
+    }
+
+    const d = new Date();
     let year = d.getFullYear();
-    let month = d.getMonth() > 9 ? d.getMonth() : '0' + (d.getMonth() + 1)
-    let day = d.getDate() > 9 ? d.getDate() : '0' + d.getDate()
+    let month = (d.getMonth() + 1).toString().padStart(2, '0'); // Corrected month formatting
+    let day = d.getDate().toString().padStart(2, '0');
 
-    const date = `${year}-${month}-${day}`
+    const date = `${year}-${month}-${day}`;
 
     let data = {
-        "user_id": "U" + d.getTime(),
+        user_id: "U" + d.getTime(),
         email,
         username,
-        password,
-        "user_type": "user",
-        "create_date": date,
-        "modify_date": date
-    }
+        password, // Consider hashing the password before storing
+        user_type: "user",
+        create_date: date,
+        modify_date: date
+    };
 
-    userTable.push(data)
+    userTable.push(data);
 
-    console.log('new data added:', userTable)
+    console.log('New user added:', data);
 
-    return res.status(200).json({ success: true, message: 'create account complete' })
-
-})
+    return res.status(200).json({ success: true, message: 'Account created successfully' });
+});
 
 app.post('/uploadClip', (req, res) => {
     const {
@@ -147,6 +154,14 @@ app.post('/uploadClip', (req, res) => {
         point,
         descripton
     } = req.body;
+
+    if (!user_id || !name || width === 0 || distance === 0) {
+        return res.status(401).json({ success: false, message: 'Invalid input data' });
+    }
+
+    if (!Array.isArray(point) || point.length !== 4) {
+        return res.status(401).json({ success: false, message: 'require 4 points' });
+    }
 
     const d = new Date()
 
@@ -177,27 +192,30 @@ app.post('/uploadClip', (req, res) => {
 })
 
 app.delete('/deleteClip', (req, res) => {
-    const { clip_id } = req.body;
-    console.log('delete at:', clip_id)
-    console.log('old: ', clipTable, "\n\n\n\n\s")
+    const { clip_id } = req.body; // Correctly extract clip_id
 
-    if (clip_id) {
-        const index = clipTable.findIndex(clip => clip.clip_id === clip_id)
+    console.log('Received delete request for clip_id:', clip_id);
+    console.log('Old ClipTable:', clipTable);
 
-        if (index !== -1) {
-            clipTable.splice(index, 1);
-
-            console.log('new: ', clipTable)
-            return res.status(200).json({ status: "success", message: 'Delete Clip Complete' })
-        }
-
-        return res.status(404).json({ status: "error", message: 'clip not found' })
+    // Validate if clip_id is provided
+    if (!clip_id) {
+        return res.status(400).json({ status: "error", message: 'Missing clip_id in request' });
     }
 
-    return res.status(400).json({ status: "error", message: 'clip not found' })
+    // Find index of the clip to delete
+    const index = clipTable.findIndex(clip => clip.clip_id === clip_id);
+
+    if (index !== -1) {
+        clipTable.splice(index, 1); // Remove the clip
+
+        console.log('Updated ClipTable:', clipTable);
+        return res.status(200).json({ status: "success", message: 'Clip deleted successfully' });
+    }
+
+    return res.status(404).json({ status: "error", message: 'Clip not found' });
+});
 
 
-})
 
 app.get('/dataOverView/:user_id', (req, res) => {
     const { user_id } = req.params;
