@@ -16,7 +16,7 @@ const clipTable = [
         "descripton": "this it comment naja😎"
     },
     {
-        "clip_id": "C2",
+        "clip_id": "C2",    
         "user_id": "U2",
         "name": "chiangrak",
         "video_path": "/video/",
