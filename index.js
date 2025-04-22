@@ -9,7 +9,7 @@ const port = 3000;
 app.use(cors());
 app.use(express.json()); // Middleware to parse JSON request body
 
-app.get('/', (req,res) => {
+app.get('/', (req, res) => {
     res.send("hello would")
 })
 
@@ -43,29 +43,29 @@ app.post('/getAllClips', (req, res) => {
         return res.status(404).json({ error: "No clips found for this user" });
     }
 
-    res.json(userClips);
+    res.json({ clips: userClips });
+
 });
 
 // Uesr login
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
-    try {
+    // username also equal email
 
+    try {
         // console.log(username, password)
-        const user = userTable.find(user => user.username === username && user.password === password);
+        const user = userTable.find(user => user.username === username || user.email === username  && user.password === password);
 
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        // Change status to "inactive"
         user.status = "active";
+
         console.log('new:', userTable)
         return res.json({ success: true, message: 'Login successful', user_id: user.user_id })
-
     } catch {
-
         return res.status(401).json({ success: false, message: 'Invalid user or password', user_id: null })
     }
 })
@@ -85,10 +85,10 @@ app.put('/logout', (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        // Change status to "inactive"
         user.status = "inactive";
 
         return res.json({ success: true, message: "Logout successful", user });
+    
     } catch (error) {
         console.error("Error during logout:", error);
         return res.status(500).json({ success: false, message: "Internal server error" });
@@ -100,10 +100,10 @@ app.post('/register', (req, res) => {
         email,
         username,
         password,
-        comfirmPassword
+        confirmPassword
     } = req.body;
 
-    if (password !== comfirmPassword) {
+    if (password !== confirmPassword) {
         return res.status(401).json({ success: false, message: 'password do not match' })
     }
 
@@ -190,8 +190,6 @@ app.delete('/deleteClip', (req, res) => {
     }
 
     return res.status(400).json({ status: "error", message: 'clip not found' })
-
-
 })
 
 app.get('/dataOverView/:user_id', (req, res) => {
@@ -214,8 +212,7 @@ app.get('/dataOverView/:user_id', (req, res) => {
     // console.log(conflictCount)
     // console.log(clipsCount)
     // console.log(activeUser)
-
-    res.send()
+    return res.status(200).send({ success: true, data: { conflictCount, activeUser, clipsCount } })
 })
 
 app.listen(port, () => {
